@@ -14,9 +14,9 @@ MODULE_AUTHOR("Aaron Rumpler");
 MODULE_DESCRIPTION("The Character Device That Never Ends");
 
 static const char LYRICS[] = "This is the character device that never ends,\n"
-							 "It just goes on and on my friends.\n"
-							 "Some process started reading it, not knowing what it was,\n"
-							 "And it'll continue reading it forever just because...\n\n";
+			     "It just goes on and on my friends.\n"
+			     "Some process started reading it, not knowing what it was,\n"
+			     "And it'll continue reading it forever just because...\n\n";
 
 static const size_t LYRICS_LENGTH = sizeof(LYRICS) - 1;
 
@@ -26,7 +26,8 @@ struct tcdtne_dev {
 	struct device *device;
 } tcdtne_dev;
 
-loff_t tcdtne_llseek(struct file *filp, loff_t off, int whence) {
+loff_t tcdtne_llseek(struct file *filp, loff_t off, int whence)
+{
 	loff_t newpos;
 
 	printk(KERN_DEBUG "tcdtne: Seeking with filp->f_pos=%lld, off=%lld, whence=%d\n", filp->f_pos, off, whence);
@@ -54,7 +55,8 @@ loff_t tcdtne_llseek(struct file *filp, loff_t off, int whence) {
 	return newpos;
 }
 
-ssize_t tcdtne_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos) {
+ssize_t tcdtne_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
+{
 	size_t bytes_copied = 0;
 
 	printk(KERN_DEBUG "tcdtne: Reading, *f_pos=%lld, count=%zu\n", *f_pos, count);
@@ -64,7 +66,7 @@ ssize_t tcdtne_read(struct file *filp, char __user *buf, size_t count, loff_t *f
 		size_t bytes_to_copy = min(bytes_available_to_copy, count - bytes_copied);
 
 		printk(KERN_DEBUG "tcdtne: Copying, *f_pos=%lld, bytes_copied=%zu, bytes_available_to_copy=%zu, bytes_to_copy=%zu, (*f_pos %% LYRICS_LENGTH)=%llu\n",
-			   *f_pos, bytes_copied, bytes_available_to_copy, bytes_to_copy, *f_pos % LYRICS_LENGTH);
+		       *f_pos, bytes_copied, bytes_available_to_copy, bytes_to_copy, *f_pos % LYRICS_LENGTH);
 
 		if (copy_to_user(buf + bytes_copied, LYRICS + (*f_pos % LYRICS_LENGTH), bytes_to_copy)) {
 			return -EFAULT;
@@ -79,25 +81,28 @@ ssize_t tcdtne_read(struct file *filp, char __user *buf, size_t count, loff_t *f
 	return bytes_copied;
 }
 
-int tcdtne_open(struct inode *inode, struct file *filp) {
+int tcdtne_open(struct inode *inode, struct file *filp)
+{
 	printk(KERN_DEBUG "tcdtne: File opened\n");
 	return 0;
 }
 
-int tcdtne_release(struct inode *inode, struct file *filp) {
+int tcdtne_release(struct inode *inode, struct file *filp)
+{
 	printk(KERN_DEBUG "tcdtne: File released\n");
 	return 0;
 }
 
 struct file_operations tcdtne_fops = {
-		.owner = THIS_MODULE,
-		.llseek = tcdtne_llseek,
-		.read = tcdtne_read,
-		.open = tcdtne_open,
-		.release = tcdtne_release,
+	.owner = THIS_MODULE,
+	.llseek = tcdtne_llseek,
+	.read = tcdtne_read,
+	.open = tcdtne_open,
+	.release = tcdtne_release,
 };
 
-int __init tcdtne_init_module(void) {
+int __init tcdtne_init_module(void)
+{
 	int rv;
 	dev_t dev;
 
@@ -155,7 +160,8 @@ err_alloc_chrdev_region:
 	return rv;
 }
 
-void __exit tcdtne_exit_module(void) {
+void __exit tcdtne_exit_module(void)
+{
 	dev_t dev = tcdtne_dev.cdev.dev;
 
 	device_destroy(tcdtne_dev.class, dev);
