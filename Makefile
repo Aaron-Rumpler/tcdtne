@@ -22,4 +22,4 @@ unload:
 
 load: module unload
 	sudo insmod $(MODULE_NAME).ko
-	sudo chmod a+r /dev/tcdtne
+	sudo chmod a+r /dev/$(MODULE_NAME)
